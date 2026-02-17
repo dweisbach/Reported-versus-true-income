@@ -849,6 +849,74 @@ def run_fixed_true_robustness():
     plt.savefig("Fig_FixedTrue_Robustness.pdf")
     plt.close()
     print("Saved to Fig_FixedTrue_Robustness.pdf")
+    
+    
+def run_fixed_true_gap_heatmap():
+    print("Generating Robustness: Inequality Gap with Fixed True Population...")
+
+    # --- 1. ESTABLISH STABLE BASELINE ---
+    N_AGENTS = 2000000
+    # Calibrate once at the neutral point (Beta=0, Sigma=0)
+    baseline_sigma = tm.solve_for_reported_share(
+        dist_type='lognormal', 
+        beta=0.0, 
+        sigma_nu=0.0, 
+        mode='loglinear', 
+        z_type='log_income', 
+        target=0.20, 
+        n_agents=N_AGENTS
+    )
+    
+    y_true_fixed = tm.generate_true_income(N_AGENTS, 'lognormal', baseline_sigma, seed=2026)
+    
+    # Calculate the fixed 1% True Share (should be approx 20%)
+    k = int(N_AGENTS * 0.01)
+    true_share_fixed = y_true_fixed[np.argsort(y_true_fixed)[-k:]].sum() / y_true_fixed.sum()
+    
+    # --- 2. SWEEP PARAMETERS ---
+    beta_vals = np.round(np.arange(-0.10, 0.11, 0.05), 2)
+    sigma_nu_vals = np.round(np.arange(0.0, 1.8, 0.2), 1)
+    gap_map = np.zeros((len(beta_vals), len(sigma_nu_vals)))
+
+    for i, beta in enumerate(beta_vals):
+        for j, snu in enumerate(sigma_nu_vals):
+            # Apply evasion to the fixed population
+            y_rep, _ = tm.apply_evasion(
+                y_true_fixed, beta=beta, sigma_nu=snu, 
+                mode='loglinear', z_type='log_income', seed=999
+            )
+            
+            # Calculate Reported Top 1% Share
+            rep_share = np.sort(y_rep)[-k:].sum() / y_rep.sum()
+            
+            # The Gap: True Share (Fixed) - Reported Share (Variable)
+            gap_map[i, j] = true_share_fixed - rep_share
+
+    # --- 3. PLOTTING ---
+    plt.figure(figsize=(10, 8))
+    y_lbl = [f"{b:.2f}" for b in np.flip(beta_vals)]
+    
+    sns.heatmap(
+        np.flipud(gap_map), 
+        annot=True, 
+        fmt=".1%", 
+        cmap="RdBu_r", # Red = Understatement, Blue = Overstatement
+        center=0, 
+        xticklabels=sigma_nu_vals, 
+        yticklabels=y_lbl,
+        cbar= False
+    )
+    
+    plt.title(f"Fixed True Share = {true_share_fixed:.1%}\n"
+              r"Calibration: $\beta$ = $\sigma_{\nu}$ = 0")
+    plt.xlabel("Sigma (Evasion Heterogeneity)")
+    plt.ylabel("Beta (Progressivity)")
+    
+    plt.tight_layout()
+    plt.savefig("Fig_Robustness_FixedTrue_Gap.pdf")
+    plt.show()
+    plt.close()
+    print("Saved to Fig_Robustness_FixedTrue_Gap.pdf")
 # =============================================================================
 # MAIN EXECUTION
 # =============================================================================
@@ -864,5 +932,6 @@ if __name__ == "__main__":
     #run_robustness_figs()
     #run_alpha_robustness()
     #run_extreme_diagnostics()
-    run_fixed_true_robustness()
+    #run_fixed_true_robustness()
+    run_fixed_true_gap_heatmap()
     print("\n=== MASTER ANALYSIS COMPLETE ===")
