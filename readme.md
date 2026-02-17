@@ -19,13 +19,13 @@ When you run `run_analysis.py`, the following files are generated in your projec
 
 | File | Description |
 | :--- | :--- |
-| **Fig1_EvasionRates.pdf** | Heatmap of evasion rates for the Top 1% and 0.1%. |
-| **Fig2_TaxGap.pdf** | Heatmap of the aggregate tax gap. |
-| **Fig3_ReportedGap.pdf** | Heatmap of the "Inequality Gap" (True - Reported). |
-| **Fig4_ShareLines.pdf** | Comparison of Reported vs. True shares (Top 10% to 0.1%). |
-| **Fig5_EvasionProfiles.pdf** | Curves showing evasion rates vs. income levels. |
-| **Fig6_Robustness_Additive.pdf**| Robustness check using Additive evasion logic. |
-| **Fig7_Robustness_Pareto.pdf** | Robustness check using Pareto distributions. |
+| **Fig_EvasionRates.pdf** | Heatmap of evasion rates for the Top 1% and 0.1%. |
+| **Fig_TaxGap.pdf** | Heatmap of the aggregate tax gap. |
+| **Fig_ReportedGap.pdf** | Heatmap of the "Inequality Gap" (True - Reported). |
+| **Fig_ShareLines.pdf** | Comparison of Reported vs. True shares (Top 10% to 0.1%). |
+| **Fig_EvasionProfiles.pdf** | Curves showing evasion rates vs. income levels. |
+| **Fig_Robustness_Additive.pdf**| Robustness check using Additive evasion logic. |
+| **Fig_Robustness_Pareto.pdf** | Robustness check using Pareto distributions. |
 | **Fig_Walkthrough_Clean.pdf** | Summary density plot and selection effect analysis. |
 | **Fig_GiniGap.pdf** | Heatmap of the difference between True and Reported Gini. |
 | **Tab1_Decomposition.csv** | Table showing Measurement vs. Re-ranking effects. |
@@ -40,3 +40,4 @@ Install them via command line:
 ```bash
 
 pip install numpy pandas matplotlib seaborn scipy
+
