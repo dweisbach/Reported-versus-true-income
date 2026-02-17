@@ -29,6 +29,8 @@ When you run `run_analysis.py`, the following files are generated in your projec
 | **Fig_Walkthrough_Clean.pdf** | Summary density plot and selection effect analysis. |
 | **Fig_GiniGap.pdf** | Heatmap of the difference between True and Reported Gini. |
 | **Tab1_Decomposition.csv** | Table showing Measurement vs. Re-ranking effects. |
+| **Fig_Robustness_FixedTrue_Gap.pdf** |Heatmap of reported income gap holding true fixed |
+| **Fig_FixedTrue_Robustness.pdf** | Heatmap of reported 1% shares, holding true fixed |
 
 ## ⚙️ Setup & Requirements
 You need Python 3.x installed along with the following libraries:
@@ -36,4 +38,5 @@ You need Python 3.x installed along with the following libraries:
 
 Install them via command line:
 ```bash
+
 pip install numpy pandas matplotlib seaborn scipy
