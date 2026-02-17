@@ -675,7 +675,7 @@ def run_extreme_diagnostics():
     BETA, SIGMA_NU, CAP, N = 0.5, 8.0, 0.99, 2000000
     T_MEAN, T_SHARE = 65000, 0.20
     
-   # --- 2. CALIBRATION ---
+    # --- 2. CALIBRATION ---
     print("  Calibrating sigma for extreme scenario...")
     low, high, cal_sigma = 0.1, 8.0, 1.0
     
@@ -745,7 +745,7 @@ def run_extreme_diagnostics():
     
     ax2.set_xscale('log'); ax2.invert_xaxis()
     ax2.set_xticks([1, 0.1, 0.01]); ax2.set_xticklabels(["1%", "0.1%", "0.01%"])
-    ax2t.set_ylabel("Avg Evasion Rate", color='green'); ax2t.set_ylim(0, 0.40)
+    ax2t.set_ylabel("Avg Evasion Rate", color='green'); ax2t.set_ylim(0, 0.60) # Raised to show extreme rates
     ax2t.tick_params(axis='y', labelcolor='green')
     
     lines, lbls = ax2.get_legend_handles_labels()
@@ -755,25 +755,34 @@ def run_extreme_diagnostics():
     
     plt.tight_layout(); plt.savefig("Fig_Extreme.pdf"); plt.close()
 
-    # --- 5. PRINT DIAGNOSTICS ---
-    print("\n" + "="*35)
-    print(f"{'EXTREME SCENARIO DIAGNOSTICS':^35}")
-    print("="*35)
-    
+    # --- 5. COMPUTE & PRINT DIAGNOSTICS ---
+    # Selection Effect Math
     ct, cr = np.percentile(yt, 99), np.percentile(yr, 99)
-    top1t, top1r = np.where(yt >= ct)[0], np.where(yr >= cr)[0]
-    rerank = 1 - (len(np.intersect1d(top1t, top1r)) / len(top1t))
+    top1t_idx = np.where(yt >= ct)[0]
+    top1r_idx = np.where(yr >= cr)[0]
     
-    # FIXED: Compute ranks on full population, then subset
+    avg_ev_true_rich = ev[top1t_idx].mean()
+    avg_ev_rep_rich = ev[top1r_idx].mean()
+    agg_tax_gap = (yt.sum() - yr.sum()) / yt.sum()
+    
+    # Re-ranking metrics
+    rerank_rate = 1 - (len(np.intersect1d(top1t_idx, top1r_idx)) / len(top1t_idx))
     all_rep_ranks = pd.Series(yr).rank(pct=True)
-    median_rank = all_rep_ranks.iloc[top1t].median() * 100
+    median_rank = all_rep_ranks.iloc[top1t_idx].median() * 100
     
-    print(f"{'Top 1% Cutoff (True):':<25} ${ct:>10,.0f}")
-    print(f"{'Top 1% Cutoff (Rep):':<25} ${cr:>10,.0f}")
-    print(f"{'Re-ranking Rate:':<25} {rerank:>11.1%}")
-    print(f"{'Median Rep Rank True Rich:':<25} P{median_rank:>10.1f}")
-    print("="*35 + "\n")
-
+    print("\n" + "="*45)
+    print(f"{'EXTREME SCENARIO DIAGNOSTICS':^45}")
+    print(f"{'(Beta=' + str(BETA) + ', Sigma_nu=' + str(SIGMA_NU) + ')':^45}")
+    print("="*45)
+    print(f"{'Avg Evasion (True Top 1%):':<30} {avg_ev_true_rich:>13.1%}")
+    print(f"{'Avg Evasion (Rep Top 1%):':<30} {avg_ev_rep_rich:>13.1%}")
+    print(f"{'Aggregate Tax Gap:':<30} {agg_tax_gap:>13.1%}")
+    print("-" * 45)
+    print(f"{'Re-ranking Rate:':<30} {rerank_rate:>13.1%}")
+    print(f"{'Median Rep Rank True Rich:':<30} P{median_rank:>12.1f}")
+    print(f"{'Top 1% Cutoff (True):':<30} ${ct:>12,.0f}")
+    print("="*45 + "\n")
+    
 def run_fixed_true_robustness():
     print("Generating Robustness Check: Fixed True Inequality...")
 
@@ -931,7 +940,7 @@ if __name__ == "__main__":
     #run_walkthrough_clean()
     #run_robustness_figs()
     #run_alpha_robustness()
-    #run_extreme_diagnostics()
+    run_extreme_diagnostics()
     #run_fixed_true_robustness()
-    run_fixed_true_gap_heatmap()
+    #run_fixed_true_gap_heatmap()
     print("\n=== MASTER ANALYSIS COMPLETE ===")
